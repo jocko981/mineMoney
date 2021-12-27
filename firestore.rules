@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /transactions/{document=**} {
+      // allow read, write; --> this is same as: allow read, create, delete, update;
+      // : if
+      //     request.time < timestamp.date(2022, 1, 22);
+
+      // lets make rules for our own data
+      allow create: if request.auth != null; 
+      // if user is not logged in, 'auth' property will be 'null'
+
+      // logged in user uid must match the document creator to Read, Delete, Update
+      allow read, delete, update: if request.auth.uid == resource.data.uid;
+    }
+  }
+}
